@@ -5,7 +5,7 @@ def get_ffme_returns():
     """
     Load the Fama-French Dataset for the returns of the Top and Bottom Deciles by MarketCap
     """
-    me_m = pd.read_csv("data/Portfolios_Formed_on_ME_monthly_EW.csv",
+    me_m = pd.read_csv("../data/Portfolios_Formed_on_ME_monthly_EW.csv",
                        header=0, index_col=0, na_values=-99.99)
     rets = me_m[['Lo 10', 'Hi 10']]
     rets.columns = ['SmallCap', 'LargeCap']
@@ -17,7 +17,7 @@ def get_fff_returns():
     """
     Load the Fama-French Research Factor Monthly Dataset
     """
-    rets = pd.read_csv("data/F-F_Research_Data_Factors_m.csv",
+    rets = pd.read_csv("../data/F-F_Research_Data_Factors_m.csv",
                        header=0, index_col=0, na_values=-99.99)/100
     rets.index = pd.to_datetime(rets.index, format="%Y%m").to_period('M')
     return rets
@@ -27,7 +27,7 @@ def get_hfi_returns():
     """
     Load and format the EDHEC Hedge Fund Index Returns
     """
-    hfi = pd.read_csv("data/edhec-hedgefundindices.csv",
+    hfi = pd.read_csv("../data/edhec-hedgefundindices.csv",
                       header=0, index_col=0, parse_dates=True)
     hfi = hfi/100
     hfi.index = hfi.index.to_period('M')
@@ -52,7 +52,7 @@ def get_ind_file(filetype, weighting="vw", n_inds=30):
     else:
         raise ValueError(f"filetype must be one of: returns, nfirms, size")
     
-    ind = pd.read_csv(f"data/ind{n_inds}_m_{name}.csv", header=0, index_col=0, na_values=-99.99)/divisor
+    ind = pd.read_csv(f"../data/ind{n_inds}_m_{name}.csv", header=0, index_col=0, na_values=-99.99)/divisor
     ind.index = pd.to_datetime(ind.index, format="%Y%m").to_period('M')
     ind.columns = ind.columns.str.strip()
     return ind
@@ -141,7 +141,7 @@ def annualize_rets(r, periods_per_year):
     """
     compounded_growth = (1+r).prod()
     n_periods = r.shape[0]
-    return compounded_growth**(periods_per_year/n_periods)-1
+    return compounded_growth**(periods_per_year/n_periods) - 1
 
 
 def annualize_vol(r, periods_per_year):
@@ -151,7 +151,7 @@ def annualize_vol(r, periods_per_year):
     but that is currently left as an exercise
     to the reader :-)
     """
-    return r.std()*(periods_per_year**0.5)
+    return r.std() * (periods_per_year**0.5)
 
 
 def sharpe_ratio(r, riskfree_rate, periods_per_year):
@@ -161,6 +161,7 @@ def sharpe_ratio(r, riskfree_rate, periods_per_year):
     # convert the annual riskfree rate to per period
     rf_per_period = (1+riskfree_rate)**(1/periods_per_year)-1
     excess_ret = r - rf_per_period
+
     ann_ex_ret = annualize_rets(excess_ret, periods_per_year)
     ann_vol = annualize_vol(r, periods_per_year)
     return ann_ex_ret/ann_vol
@@ -606,7 +607,7 @@ def weight_cw(r, cap_weights, **kwargs):
     w = cap_weights.loc[r.index[1]]
     return w/w.sum()
 
-def backtest_ws(r, estimation_window=60, weighting=weight_ew, verbose=False, **kwargs):
+def backtest_ws(r, estimation_window=60, weighting=weight_ew, **kwargs):
     """
     Backtests a given weighting scheme, given some parameters:
     r : asset returns to use to build the portfolio
