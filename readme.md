@@ -1,3 +1,3 @@
 # Portafolio Analysis
 
-Basic Asset allocation and Risk management methodologies.
+An exploration of asset allocation and Risk management methodologies.
